@@ -1,0 +1,14 @@
+﻿using DapperAPI.Models;
+
+namespace DapperAPI.IRepository
+{
+    public interface IDesignationRepository
+    {
+        Task<bool> DesignationExistsAsync(string name); //to check if the Department exists or not
+        Task<IEnumerable<Designation>> GetAllAsync(); 
+        Task<Designation> GetDesignationById(int id); 
+        Task AddItemAsync(Designation item);
+        Task DeleteAsync(Designation department);
+        Task UpdateAsync(Designation department); 
+    }
+}
