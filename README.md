@@ -1,4 +1,4 @@
-# ASP.NET Core Web API with Repository Pattern
+# Dapper Based Employee MAnagement API using ASP.NET Core Web API with Repository Pattern
 
 ## **Overview**
 This project is a Web API built using **ASP.NET Core**, implementing the **Repository Pattern** for maintainability and scalability. It provides **CRUD operations** with **Dapper** for database interaction and uses **SQL Server Management Studio (SSMS)** as the database.
