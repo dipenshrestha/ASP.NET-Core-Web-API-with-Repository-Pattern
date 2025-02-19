@@ -41,6 +41,19 @@ namespace DapperAPI.Repository
 
             return result.FirstOrDefault() ?? throw new KeyNotFoundException($"Department with ID {id} not found.");
         }
+        public async Task<bool> DepartmentExistsAsync(string name)
+        {
+            using var connection = _context.CreateConnection();
+            // Returns true if an Depertment with the same details existsusing var connection = _context.CreateConnection();
+            var sql = @"
+            SELECT COUNT(*) 
+            FROM Department 
+            WHERE DepartmentName = @name";
+
+            int count = await connection.ExecuteScalarAsync<int>(sql, new { name });
+
+            return count > 0;
+        }
         public async Task AddItemAsync(Department item)
         {
             using var connection = _context.CreateConnection();
@@ -54,19 +67,6 @@ namespace DapperAPI.Repository
             // $"" allows us to use string interpolation thats why we use it
             var sql = $"INSERT INTO Department (DepartmentName) VALUES (@name)";
             await connection.ExecuteAsync(sql, new {name = item.DepartmentName});
-        }
-        public async Task<bool> DepartmentExistsAsync(string name)
-        {
-            using var connection = _context.CreateConnection();
-            // Returns true if an employee with the same details existsusing var connection = _context.CreateConnection();
-            var sql = @"
-            SELECT COUNT(*) 
-            FROM Department 
-            WHERE DepartmentName = @name";
-
-            int count = await connection.ExecuteScalarAsync<int>(sql, new {name});
-
-            return count > 0; 
         }
         public async Task DeleteAsync(Department department)
         {

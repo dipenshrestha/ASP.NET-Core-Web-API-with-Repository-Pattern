@@ -52,8 +52,15 @@ namespace DapperAPI.Controllers
             {
                 return BadRequest();
             }
-            await _repository.AddItemAsync(employee);
-            return Ok(employee);
+            try
+            {
+                await _repository.AddItemAsync(employee);
+                return Ok(employee);
+            }
+            catch (InvalidOperationException ex) {
+                return NotFound(ex.Message);
+            }
+            
         }
 
         [HttpDelete("id")]
