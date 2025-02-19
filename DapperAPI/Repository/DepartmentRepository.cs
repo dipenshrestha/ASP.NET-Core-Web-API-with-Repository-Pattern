@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using DapperAPI.IRepository;
 using DapperAPI.Models;
+using Microsoft.VisualBasic;
 
 namespace DapperAPI.Repository
 {
@@ -39,12 +40,17 @@ namespace DapperAPI.Repository
             return department;
             */
 
-            return result.FirstOrDefault() ?? throw new KeyNotFoundException($"Department with ID {id} not found.");
+            return result.FirstOrDefault() ?? throw new ($"Department with ID {id} not found.");
         }
         public async Task<bool> DepartmentExistsAsync(string name)
         {
             using var connection = _context.CreateConnection();
-            // Returns true if an Depertment with the same details existsusing var connection = _context.CreateConnection();
+            // Returns true if an Depertment with the same details exists.
+
+            //@"" is called Verbatim String
+            //Treats the string literally, ignoring escape characters like \.
+            // whereas $"" doesnt ignore escape characters
+            //Useful for file paths and multi - line strings.
             var sql = @"
             SELECT COUNT(*) 
             FROM Department 
@@ -54,14 +60,31 @@ namespace DapperAPI.Repository
 
             return count > 0;
         }
+        public async Task<bool> DepartmentIdExistsAsync(int id)
+        {
+            using var connection = _context.CreateConnection();
+            // Returns true if an Depertment with the same details exists.
+
+            //@"" is called Verbatim String
+            //Treats the string literally, ignoring escape characters like \.
+            // whereas $"" doesnt ignore escape characters
+            //Useful for file paths and multi - line strings.
+            var sql = @"
+            SELECT COUNT(*) 
+            FROM Department 
+            WHERE DepartmentId = @id";
+
+            int count = await connection.ExecuteScalarAsync<int>(sql, new { id });
+            return count > 0;
+        }
         public async Task AddItemAsync(Department item)
         {
             using var connection = _context.CreateConnection();
             //Check if employee already exists
-            bool exists = await DepartmentExistsAsync(item.DepartmentName);
-            if (exists)
+            bool exists = await DepartmentIdExistsAsync(item.DepartmentId);
+            if (!exists)
             {
-                throw new InvalidOperationException("An Department with the same Name already exists.");
+                throw new ("An Department with Id doesnt exists.");
             }
 
             // $"" allows us to use string interpolation thats why we use it
@@ -70,6 +93,11 @@ namespace DapperAPI.Repository
         }
         public async Task DeleteAsync(Department department)
         {
+            bool exists = await DepartmentIdExistsAsync(department.DepartmentId);
+            if (!exists)
+            {
+                throw new ("An Department with Id doesnt exists.");
+            }
             using var connection = _context.CreateConnection();
             var sql = $" DELETE FROM Department WHERE DepartmentID = @id";
             await connection.ExecuteAsync(sql, new { id = department.DepartmentId });

@@ -1,6 +1,7 @@
 ﻿using DapperAPI.IRepository;
 using DapperAPI.Models;
 using DapperAPI.Repository;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DapperAPI.Controllers
@@ -40,7 +41,7 @@ namespace DapperAPI.Controllers
                 Department obj = await _repository.GetDepartmentById(id);
                 return Ok(obj);
             }
-            catch (KeyNotFoundException ex)
+            catch (Exception ex)
             {
                 return NotFound(ex.Message);
             }
@@ -71,7 +72,7 @@ namespace DapperAPI.Controllers
                     await _repository.AddItemAsync(obj);
                     return Ok("Department added successfully.");
                 }
-                catch (InvalidOperationException ex)
+                catch (Exception ex)
                 {
                     return Conflict(ex.Message); // 409 Conflict if Department exists
                 }
@@ -92,26 +93,30 @@ namespace DapperAPI.Controllers
             {
                 return BadRequest();
             }
-            Department obj = await _repository.GetDepartmentById(id);
-            if (obj == null)
+            try
             {
-                return NotFound();
+                Department obj = await _repository.GetDepartmentById(id);
+                await _repository.DeleteAsync(obj);
+                return NoContent();
             }
-            await _repository.DeleteAsync(obj);
-            return NoContent();
+            catch(Exception ex)
+            { 
+                return NotFound(ex.Message);
+            }
+            
         }
 
         [HttpPut("id")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<Department>> Update(int id, [FromBody] Department obj)
+        public async Task<ActionResult<Department>> Update([FromBody] Department obj)
         {
-            if (id == 0 || obj.DepartmentId != id)
+            if (obj.DepartmentId == 0)
             {
                 return BadRequest();
             }
-            Department item = await _repository.GetDepartmentById(id);
+            Department item = await _repository.GetDepartmentById(obj.DepartmentId);
             if (item == null)
             {
                 return NotFound();

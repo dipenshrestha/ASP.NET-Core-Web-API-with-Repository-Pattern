@@ -33,6 +33,16 @@ namespace DapperAPI.Repository
             int count = await connection.ExecuteScalarAsync<int>(sql, new { name });
             return count > 0;
         }
+        public async Task<bool> DesignationIdExistsAsync(int id)
+        {
+            using var connection = _context.CreateConnection();
+            var sql = @"
+            SELECT COUNT(*) 
+            FROM Designation 
+            WHERE DesignationId = @id";
+            int count = await connection.ExecuteScalarAsync<int>(sql, new { id });
+            return count > 0;
+        }
         public async Task AddItemAsync(Designation item)
         {
             using var connection = _context.CreateConnection();

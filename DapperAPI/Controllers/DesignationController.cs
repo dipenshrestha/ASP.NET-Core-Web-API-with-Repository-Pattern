@@ -100,13 +100,13 @@ namespace DapperAPI.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<Designation>> Update(int id, [FromBody] Designation obj)
+        public async Task<ActionResult<Designation>> Update([FromBody] Designation obj)
         {
-            if (id == 0 || obj.DesignationId != id)
+            if (obj.DesignationId == 0)
             {
                 return BadRequest();
             }
-            Designation item = await _repository.GetDesignationById(id);
+            Designation item = await _repository.GetDesignationById(obj.DesignationId);
             if (item == null)
             {
                 return NotFound();

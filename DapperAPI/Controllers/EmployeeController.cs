@@ -81,13 +81,13 @@ namespace DapperAPI.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<Employee>> UpdateEmployee(int id, [FromBody] Employee employee)
+        public async Task<ActionResult<Employee>> UpdateEmployee([FromBody] Employee employee)
         {
-            if (id == 0 || employee.EmployeeId != id)
+            if (employee.EmployeeId == 0)
             {
                 return BadRequest();
             }
-            Employee obj = await _repository.GetByIdAsync(id);
+            Employee obj = await _repository.GetByIdAsync(employee.EmployeeId);
             if (obj == null)
             {
                 return NotFound();
